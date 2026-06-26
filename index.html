@@ -8,20 +8,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1E1B2E;
-    --ink-soft:#6B6580;
-    --bg:#F4F2FB;
-    --panel:#FFFFFF;
-    --line:#E5E1F5;
-    --purple:#6C2BD9;
-    --purple-dark:#4B19A8;
-    --purple-soft:#EFE6FF;
-    --teal:#00BFA6;
-    --teal-soft:#E2FBF6;
-    --warn:#FF5470;
-    --radius:12px;
-  }
-  *{box-sizing:border-box;}
+              --ink: #0F172A;
+              --ink-soft: #64748B;
+              --bg: #F8FAFC;
+              --panel: #FFFFFF;
+              --line: #E2E8F0;
+              --purple: #0F172A;
+              --purple-dark: #000000;
+              --purple-soft: #F1F5F9;
+              --teal: #3B82F6;
+              --teal-soft: #EFF6FF;
+              --warn: #EF4444;
+              --radius: 8px;
+          }
+          *{box-sizing:border-box;}
   html,body{height:100%;margin:0;}
   body{
     font-family:'Inter',sans-serif;
@@ -42,10 +42,37 @@
   }
   .brand{display:flex;align-items:center;gap:8px;margin-right:6px;}
   .brand-mark{
-    width:32px;height:32px;border-radius:9px;flex:0 0 auto;
-    background:conic-gradient(from 220deg,var(--purple),var(--teal),var(--purple));
-    position:relative;box-shadow:0 3px 8px rgba(108,43,217,.35);
-  }
+              width:30px;height:30px;border-radius:6px;flex:0 0 auto;
+              background:var(--ink);
+              position:relative;display:flex;align-items:center;justify-content:center;
+          }
+          .brand-mark::after{
+              content:"";width:12px;height:12px;border:3px solid #fff;border-radius:50%;
+          }
+          .brand-name{font-family:'Outfit',sans-serif;font-weight:800;font-size:19px;letter-spacing:-.02em;}
+          .brand-name span{color:var(--ink-soft);}
+          .tb-divider{width:1px;height:28px;background:var(--line);}
+          .tb-btn{
+              border:1px solid transparent;background:transparent;border-radius:6px;
+              height:36px;padding:0 10px;display:flex;align-items:center;gap:6px;
+              font-size:13.5px;font-weight:600;color:var(--ink);
+          }
+          .tb-btn:hover{background:var(--bg);}
+          .tb-btn:disabled{opacity:.35;cursor:not-allowed;}
+          .tb-icon{width:18px;height:18px;flex:0 0 auto;}
+          select.tb-select{
+              height:36px;border:1px solid var(--line);border-radius:6px;background:var(--panel);
+              padding:0 10px;font-size:13px;font-weight:600;color:var(--ink);
+          }
+          .zoom-group{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:6px;padding:2px;}
+          .zoom-group .tb-btn{height:30px;width:30px;padding:0;justify-content:center;}
+          .zoom-label{font-size:12.5px;font-weight:700;width:46px;text-align:center;color:var(--ink-soft);}
+          .spacer{flex:1;}
+          .primary-btn{
+              background:var(--purple);color:#fff;border:none;border-radius:6px;
+              height:38px;padding:0 16px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px;
+              box-shadow:0 1px 3px rgba(0,0,0,.15);
+          }
   .brand-mark::after{
     content:"";position:absolute;inset:7px;background:var(--panel);border-radius:6px;
     clip-path:path('M4 18 C2 10, 10 2, 18 4 C 14 6, 8 12, 4 18 Z');
@@ -307,11 +334,9 @@ let zoom = 1;
 let activePanel = 'templates';
 let activeTab = 'props';
 let canvasW = 900, canvasH = 900;
-let draw = { tool:'pen', color:'#3A2E6B', size:6, opacity:1 };
-let pendingTextStyle = { fontFamily:"'Inter',sans-serif", fontSize:20, fontWeight:600, color:'#1E1B2E' };
-
-const PALETTE = ['#1E1B2E','#6C2BD9','#00BFA6','#FF5470','#FFB23F','#3AA9FF',
-                  '#FFFFFF','#F4F2FB','#16A35E','#7B61FF','#FF8C42','#222222'];
+        let draw = { tool:'pen', color:'#0F172A', size:6, opacity:1 };
+        let pendingTextStyle = { fontFamily:"'Inter',sans-serif", fontSize:20, fontWeight:600, color:'#0F172A' };
+        const PALETTE = ['transparent','#0F172A','#000000','#FFFFFF','#3B82F6','#10B981','#EF4444','#F59E0B','#8B5CF6','#64748B','#E2E8F0','#F1F5F9'];
 
 const artboard = document.getElementById('artboard');
 const drawCanvas = document.getElementById('drawCanvas');
@@ -326,34 +351,29 @@ const rpContent = document.getElementById('rp-content');
 function uid(){ return 'el' + (nextId++); }
 
 function defaultPropsFor(type){
-  const base = { id:uid(), type, x:canvasW/2-90, y:canvasH/2-60, w:180, h:120, rot:0,
-                 fill:'#6C2BD9', stroke:'none', strokeWidth:0, opacity:1, locked:false, hidden:false };
-  if(type==='text'){
-    return {...base, w:280, h:50, fill:'transparent', text:'Add your text here',
-      fontFamily:pendingTextStyle.fontFamily, fontSize:pendingTextStyle.fontSize,
-      fontWeight:pendingTextStyle.fontWeight, fontStyle:'normal', color:pendingTextStyle.color,
-      align:'left', x:canvasW/2-140, y:canvasH/2-25};
-  }
-  if(type==='sticky'){
-    return {...base, w:170, h:170, fill:'#FFF3A0', text:'Sticky note', fontFamily:"'Caveat',cursive",
-      fontSize:22, fontWeight:600, color:'#5B4A00', align:'center'};
-  }
-  if(type==='line'){
-    return {...base, w:220, h:4, fill:'#1E1B2E', stroke:'none'};
-  }
-  if(type==='frame-circle' || type==='frame-square'){
-    return {...base, w:160, h:160, fill:'linear-gradient(135deg,#C9B8F5,#9FE8DA)'};
-  }
-  if(type==='chart'){
-    return {...base, w:300, h:200, fill:'#fff',
-      chartType:'bar', data:[
-        {label:'Mon',value:30,color:'#6C2BD9'},
-        {label:'Tue',value:55,color:'#00BFA6'},
-        {label:'Wed',value:40,color:'#FF8C42'}
-      ]};
-  }
-  return base;
-}
+            const base = { id:uid(), type, x:canvasW/2-90, y:canvasH/2-60, w:180, h:120, rot:0, fill:'#E2E8F0', stroke:'none', strokeWidth:0, opacity:1, locked:false, hidden:false };
+            if(type==='image') return { ...base, fill:'transparent', src:'' };
+            if(type==='text'){
+                return {...base, w:280, h:50, fill:'transparent', text:'Add your text here', fontFamily:pendingTextStyle.fontFamily, fontSize:pendingTextStyle.fontSize, fontWeight:pendingTextStyle.fontWeight, fontStyle:'normal', color:pendingTextStyle.color, align:'left', x:canvasW/2-140, y:canvasH/2-25};
+            }
+            if(type==='sticky'){
+                return {...base, w:170, h:170, fill:'#FEF08A', text:'Sticky note', fontFamily:"'Caveat',cursive", fontSize:22, fontWeight:600, color:'#422006', align:'center'};
+            }
+            if(type==='line'){
+                return {...base, w:220, h:4, fill:'#0F172A', stroke:'none'};
+            }
+            if(type==='frame-circle' || type==='frame-square'){
+                return {...base, w:160, h:160, fill:'#F1F5F9'};
+            }
+            if(type==='chart'){
+                return {...base, w:300, h:200, fill:'#fff', chartType:'bar', data:[
+                    {label:'Mon',value:30,color:'#0F172A'},
+                    {label:'Tue',value:55,color:'#3B82F6'},
+                    {label:'Wed',value:40,color:'#10B981'}
+                ]};
+            }
+            return base;
+        }
 
 function pushHistory(){
   history = history.slice(0, historyIndex+1);
@@ -479,23 +499,66 @@ function buildNode(e){
       inner.style.cssText='width:100%;height:100%;background:'+e.fill+';border-radius:3px;';
       node.appendChild(inner); break;
     case 'frame-circle':
-      inner=document.createElement('div');
-      inner.style.cssText='width:100%;height:100%;background:'+e.fill+';border-radius:50%;display:flex;align-items:center;justify-content:center;color:#5840A8;font-size:11px;font-weight:700;font-family:Outfit,sans-serif;';
-      inner.textContent='IMAGE';
-      node.appendChild(inner); break;
-    case 'frame-square':
-      inner=document.createElement('div');
-      inner.style.cssText='width:100%;height:100%;background:'+e.fill+';border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5840A8;font-size:11px;font-weight:700;font-family:Outfit,sans-serif;';
-      inner.textContent='IMAGE';
-      node.appendChild(inner); break;
-    case 'sticky':
-      inner=document.createElement('div');
-      inner.style.cssText='width:100%;height:100%;background:'+e.fill+';border-radius:4px;box-shadow:0 6px 14px rgba(0,0,0,.12);padding:14px;';
-      const stickyTxt = document.createElement('div');
-      stickyTxt.className='el-text'; stickyTxt.contentEditable='true';
-      stickyTxt.style.cssText='font-family:'+e.fontFamily+';font-size:'+e.fontSize+'px;font-weight:'+e.fontWeight+';color:'+e.color+';text-align:'+e.align+';';
-      stickyTxt.textContent = e.text;
-      stickyTxt.addEventListener('blur',()=>{ e.text=stickyTxt.textContent; pushHistory(); });
+                    inner=document.createElement('div');
+                    inner.style.cssText='width:100%;height:100%;background:'+e.fill+';border-radius:50%;display:flex;align-items:center;justify-content:center;color:#64748B;font-size:11px;font-weight:700;font-family:Outfit,sans-serif;';
+                    inner.textContent='FRAME';
+                    node.appendChild(inner);
+                    break;
+                case 'frame-square':
+                    inner=document.createElement('div');
+                    inner.style.cssText='width:100%;height:100%;background:'+e.fill+';border-radius:10px;display:flex;align-items:center;justify-content:center;color:#64748B;font-size:11px;font-weight:700;font-family:Outfit,sans-serif;';
+                    inner.textContent='FRAME';
+                    node.appendChild(inner);
+                    break;
+                case 'sticky':
+                    inner=document.createElement('div');
+                    inner.style.cssText='width:100%;height:100%;background:'+e.fill+';border-radius:4px;box-shadow:0 6px 14px rgba(0,0,0,.12);padding:14px;';
+                    const stickyTxt = document.createElement('div');
+                    stickyTxt.className='el-text';
+                    stickyTxt.contentEditable='true';
+                    stickyTxt.style.cssText='font-family:'+e.fontFamily+';font-size:'+e.fontSize+'px;font-weight:'+e.fontWeight+';color:'+e.color+';text-align:'+e.align+';';
+                    stickyTxt.textContent = e.text;
+                    stickyTxt.addEventListener('blur',()=>{
+                        e.text=stickyTxt.textContent;
+                        pushHistory();
+                    });
+                    stickyTxt.addEventListener('dblclick', ev=>{ stickyTxt.focus(); ev.stopPropagation(); });
+                    stickyTxt.addEventListener('mousedown', ev=>{
+                        if(document.activeElement !== stickyTxt) ev.preventDefault();
+                        else ev.stopPropagation();
+                    });
+                    inner.appendChild(stickyTxt);
+                    node.appendChild(inner);
+                    break;
+                case 'text':
+                    inner=document.createElement('div');
+                    inner.className='el-text';
+                    inner.contentEditable='true';
+                    inner.style.cssText='font-family:'+e.fontFamily+';font-size:'+e.fontSize+'px;font-weight:'+e.fontWeight+
+                        ';font-style:'+e.fontStyle+';color:'+e.color+';text-align:'+e.align+';';
+                    inner.textContent = e.text;
+                    inner.addEventListener('blur',()=>{
+                        e.text=inner.textContent;
+                        pushHistory();
+                    });
+                    inner.addEventListener('dblclick', ev=>{ inner.focus(); ev.stopPropagation(); });
+                    inner.addEventListener('mousedown', ev=>{
+                        if(document.activeElement !== inner) ev.preventDefault();
+                        else ev.stopPropagation();
+                    });
+                    node.appendChild(inner);
+                    break;
+                case 'image':
+                    inner=document.createElement('img');
+                    inner.src = e.src;
+                    inner.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:6px;pointer-events:none;';
+                    node.appendChild(inner);
+                    break;
+                case 'chart':
+                    inner = buildChartNode(e);
+                    node.appendChild(inner);
+                    break;
+            });
       stickyTxt.addEventListener('mousedown', ev=>ev.stopPropagation());
       inner.appendChild(stickyTxt);
       node.appendChild(inner); break;
@@ -627,9 +690,18 @@ document.addEventListener('keydown',(ev)=>{
     if(ev.key==='ArrowLeft'){ e.x-=step; renderAll(); }
     if(ev.key==='ArrowRight'){ e.x+=step; renderAll(); }
     if(ev.key==='ArrowUp'){ e.y-=step; renderAll(); }
-    if(ev.key==='ArrowDown'){ e.y+=step; renderAll(); }
-  }
-});
+    if(ev.key==='ArrowDown'){
+                    e.y+=step;
+                    renderAll();
+                }
+            }
+        });
+        document.addEventListener('keyup', (ev) => {
+            const editing = document.activeElement.isContentEditable;
+            if(!editing && selectedIds.length === 1 && ev.key.startsWith('Arrow')) {
+                pushHistory();
+            }
+        });
 
 /* ============================================================
    ELEMENT ACTIONS
@@ -860,11 +932,35 @@ function renderSidepanel(){
       addElement('chart',{chartType,data});
     };
     sidepanel.appendChild(insertBtn);
-  }
-  else if(activePanel==='uploads'){
-    sidepanel.innerHTML = '<h3>Uploads</h3><p class="hint">This demo doesn\\'t connect to cloud storage, so real image upload isn\\'t wired up. Use a Frame from the Elements panel as a placeholder for where a photo would go, or a Sticky note for quick text blocks.</p>';
-  }
-}
+  } else if(activePanel==='uploads'){
+                  sidepanel.innerHTML = '<h3>Uploads</h3><p class="hint">Add your own images directly to the canvas.</p>';
+                  const label = document.createElement('label');
+                  label.className = 'primary-btn';
+                  label.style.marginTop = '12px';
+                  label.style.justifyContent = 'center';
+                  label.style.cursor = 'pointer';
+                  label.innerHTML = '⇧ Upload Image <input type="file" id="imgUploadInput" accept="image/*" style="display:none">';
+                  sidepanel.appendChild(label);
+                
+                  document.getElementById('imgUploadInput').onchange = (e) => {
+                      const file = e.target.files[0];
+                      if(!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                          const img = new Image();
+                          img.onload = () => {
+                              const ratio = img.height / img.width;
+                              let w = Math.min(300, img.width);
+                              let h = w * ratio;
+                              addElement('image', { src: ev.target.result, w, h });
+                          };
+                          img.src = ev.target.result;
+                      };
+                      reader.readAsDataURL(file);
+                      e.target.value = '';
+                  };
+              }
+          }
 
 document.querySelectorAll('.rail-btn').forEach(btn=>{
   btn.onclick=()=>{ activePanel=btn.dataset.panel; renderSidepanel();
@@ -898,10 +994,33 @@ function renderProps(){
   const e = getEl(selectedIds[selectedIds.length-1]);
 
   if(!multi && (e.type==='rect'||e.type==='ellipse'||e.type==='triangle'||e.type==='star'||e.type==='line'||e.type==='frame-circle'||e.type==='frame-square'||e.type==='sticky')){
-    rpContent.appendChild(fieldLabel('Fill color'));
-    rpContent.appendChild(buildSwatchPicker(e.fill, c=>{ e.fill=c; renderAll(); pushHistory(); }));
-  }
-  if(!multi && (e.type==='text'||e.type==='sticky')){
+                  rpContent.appendChild(fieldLabel('Fill color'));
+                  rpContent.appendChild(buildSwatchPicker(e.fill, c=>{
+                      e.fill=c;
+                      renderAll();
+                      pushHistory();
+                  }));
+              }
+              if(!multi && (e.type==='rect'||e.type==='ellipse')){
+                  rpContent.appendChild(fieldLabel('Border color'));
+                  rpContent.appendChild(buildSwatchPicker(e.stroke==='none'?'transparent':e.stroke, c=>{
+                      e.stroke = c==='transparent' ? 'none' : c;
+                      if(e.stroke!=='none' && !e.strokeWidth) e.strokeWidth = 4;
+                      renderAll();
+                      pushHistory();
+                  }));
+                  rpContent.appendChild(fieldLabel('Border width'));
+                  const bwRow=document.createElement('div');
+                  bwRow.className='range-row';
+                  const bwInput=document.createElement('input');
+                  bwInput.type='range'; bwInput.min=0; bwInput.max=40; bwInput.value=e.strokeWidth||0;
+                  const bwVal=document.createElement('span'); bwVal.textContent=(e.strokeWidth||0)+'px';
+                  bwInput.oninput=(ev)=>{ e.strokeWidth=+ev.target.value; bwVal.textContent=e.strokeWidth+'px'; renderAll(); };
+                  bwInput.onchange=()=>pushHistory();
+                  bwRow.append(bwInput,bwVal);
+                  rpContent.appendChild(bwRow);
+              }
+              if(!multi && (e.type==='text'||e.type==='sticky')){
     rpContent.appendChild(fieldLabel('Text color'));
     rpContent.appendChild(buildSwatchPicker(e.color, c=>{ e.color=c; renderAll(); pushHistory(); }));
 
@@ -989,18 +1108,24 @@ function renderProps(){
 }
 
 function buildSwatchPicker(current, onPick){
-  const wrap=document.createElement('div'); wrap.className='swatch-row';
-  PALETTE.forEach(c=>{
-    const sw=document.createElement('div'); sw.className='swatch'+(current===c?' selected':'');
-    sw.style.background=c; sw.onclick=()=>onPick(c);
-    wrap.appendChild(sw);
-  });
-  const cw=document.createElement('input'); cw.type='color'; cw.className='colorwell';
-  cw.value = current && current.startsWith('#') ? current : '#6C2BD9';
-  cw.oninput=(e)=>onPick(e.target.value);
-  wrap.appendChild(cw);
-  return wrap;
-}
+            const wrap=document.createElement('div');
+            wrap.className='swatch-row';
+            PALETTE.forEach(c=>{
+                const sw=document.createElement('div');
+                sw.className='swatch'+(current===c?' selected':'');
+                if(c==='transparent') sw.style.background = 'repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) 50% / 8px 8px';
+                else sw.style.background=c;
+                sw.onclick=()=>onPick(c);
+                wrap.appendChild(sw);
+            });
+            const cw=document.createElement('input');
+            cw.type='color';
+            cw.className='colorwell';
+            cw.value = current && current.startsWith('#') ? current : '#000000';
+            cw.oninput=(e)=>onPick(e.target.value);
+            wrap.appendChild(cw);
+            return wrap;
+        }
 
 function renderLayers(){
   if(!elements.length){
@@ -1107,8 +1232,14 @@ document.getElementById('downloadBtn').onclick=()=>{
       const tx = e.align==='center'?e.w/2 : e.align==='right'?e.w:0;
       lines.forEach((line,i)=>octx.fillText(line, tx, i*(e.fontSize*1.25)));
     }
-    if(e.type==='chart'){
-      octx.fillStyle='#ffffff'; roundRect(octx,0,0,e.w,e.h,8); octx.fill();
+    if(e.type==='image' && e.src){
+                        const img = new Image();
+                        img.src = e.src;
+                        octx.drawImage(img, 0, 0, e.w, e.h);
+                    }
+                    if(e.type==='chart'){
+                        octx.fillStyle='#ffffff';
+                        roundRect(octx,0,0,e.w,e.h,8); octx.fill();
       if(e.chartType==='bar'){
         const max=Math.max(...e.data.map(d=>d.value),1);
         const colW = e.w/e.data.length;
